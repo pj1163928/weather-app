@@ -1,0 +1,19 @@
+<a
+  class="here"
+  href="{{ url }}"
+  hx-get="{{ url }}"
+  hx-target="#weather"
+  hx-swap="outerHTML"
+>
+  <span class="here-copy">
+    <span class="here-kicker">Your location</span>
+    <span class="here-name">{{ name }}</span>
+    {% if region or country %}
+    <span class="here-where">{{ region }}{% if region and country %}, {% endif %}{{ country }}</span>
+    {% endif %}
+  </span>
+  <span class="here-readout">
+    <span class="here-temp">{{ temperature }}</span>
+    <span class="here-condition">{% include "weather/_icon.html" with kind=kind %}{{ condition }}</span>
+  </span>
+</a>

@@ -1,0 +1,6 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+<p class="lede">Open this link to confirm your account. No email was sent.</p>
+<p><a class="confirm-link" href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+{% endblock %}

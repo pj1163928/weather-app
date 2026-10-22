@@ -1,0 +1,19 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+{% if confirm_error %}
+  <p class="alert">Confirm your account first</p>
+  <p class="account-links"><a href="{% url 'accounts:confirm-again' %}?next={{ next|urlencode }}">Show that message again</a></p>
+{% endif %}
+{% if form.non_field_errors %}
+  <div class="alert">{{ form.non_field_errors }}</div>
+{% endif %}
+<form class="account-form" method="post" action="{% url 'accounts:login' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "accounts/_fields.html" %}
+  <button type="submit">Log in</button>
+</form>
+<p class="account-links">No account yet? <a href="{% url 'accounts:register' %}?next={{ next|urlencode }}">Register</a></p>
+<p class="account-links"><a href="{% url 'accounts:password-reset' %}?next={{ next|urlencode }}">Reset password</a></p>
+{% endblock %}

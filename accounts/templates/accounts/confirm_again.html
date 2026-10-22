@@ -1,0 +1,20 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+{% if message %}
+  <p class="{% if already_confirmed %}notice{% else %}alert{% endif %}">{{ message }}</p>
+{% endif %}
+{% if already_confirmed %}
+  <p class="account-links"><a href="{% url 'accounts:login' %}?next={{ next|urlencode }}">Log in</a></p>
+{% endif %}
+{% if confirm_url %}
+  <p class="lede">Open this link to confirm your account. No email was sent.</p>
+  <p><a class="confirm-link" href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+{% endif %}
+<form class="account-form" method="post" action="{% url 'accounts:confirm-again' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "accounts/_fields.html" %}
+  <button type="submit">Show that message again</button>
+</form>
+{% endblock %}

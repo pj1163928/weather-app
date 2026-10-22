@@ -1,0 +1,11 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+<form class="account-form" method="post" action="{% url 'accounts:register' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "accounts/_fields.html" %}
+  <button type="submit">Create account</button>
+</form>
+<p class="account-links">Already registered? <a href="{% url 'accounts:login' %}?next={{ next|urlencode }}">Log in</a></p>
+{% endblock %}

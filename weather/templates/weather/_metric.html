@@ -1,0 +1,33 @@
+{% if metric == "feels" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M10 13.6V5.2a2 2 0 1 1 4 0v8.4a3.4 3.4 0 1 1-4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M12 8.4v5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="12" cy="17.3" r="1.15" fill="currentColor"/>
+</svg>
+{% elif metric == "humidity" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M12 3.5s6 6.2 6 10.1a6 6 0 0 1-12 0c0-3.9 6-10.1 6-10.1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>
+{% elif metric == "wind" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M4 8h9.5a2.2 2.2 0 1 0-2.1-3M4 12h13.2a2.4 2.4 0 1 1-2.2 3.4M4 16h7.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% elif metric == "pressure" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M5 16.5a7 7 0 1 1 14 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M12 16.5 15.2 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="12" cy="16.5" r="1.2" fill="currentColor"/>
+</svg>
+{% elif metric == "sunrise" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M4 17h16M7 17a5 5 0 0 1 10 0M12 4.5v3M6.2 8.2l1.6 1.6M17.8 8.2l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% elif metric == "sunset" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M4 17h16M7 17a5 5 0 0 1 10 0M12 10.5V7.5M6.2 13.8l1.6-1.6M17.8 13.8l-1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% else %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M7 17c-2.2 0-4-1.7-4-3.8C3 11 4.7 9.2 7 9.1 7.6 7 9.5 5.5 11.8 5.5c2.8 0 5 2.1 5.2 4.8 1.8.2 3.2 1.7 3.2 3.5 0 2-1.6 3.6-3.7 3.6H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>
+{% endif %}

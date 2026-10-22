@@ -1,0 +1,29 @@
+<div id="saved-places" class="saved-places">
+  <p class="saved-label">Places</p>
+  {% if favorites %}
+  <ul>
+    {% for favorite in favorites %}
+    <li>
+      <a
+        href="{{ favorite.open_path }}"
+        hx-get="{{ favorite.open_path }}"
+        hx-target="#weather"
+        hx-swap="outerHTML"
+      >{{ favorite.display_label }}</a>
+      <form
+        method="post"
+        action="{% url 'weather:favorite-remove' favorite.pk %}"
+        hx-post="{% url 'weather:favorite-remove' favorite.pk %}"
+        hx-target="#saved-places"
+        hx-swap="outerHTML"
+      >
+        {% csrf_token %}
+        <button type="submit" aria-label="Remove {{ favorite.display_label }}">Remove</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="saved-empty">No saved places yet.</p>
+  {% endif %}
+</div>

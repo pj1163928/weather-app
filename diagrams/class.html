@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Class — Weather app diagrams</title>
+    <link rel="stylesheet" href="diagrams.css">
+  </head>
+  <body>
+    <main>
+      <p><a href="index.html">All diagrams</a></p>
+      <h1>Class</h1>
+      <p>User, Favorite, and ActionLink are stored. Place, CurrentConditions, and DailyForecast are temporary.</p>
+      <pre class="mermaid">
+classDiagram
+accTitle: Weather app classes
+accDescr: Stored types are User, Favorite, and ActionLink. A user has zero or more favorites and zero or more action links. Place, CurrentConditions, and DailyForecast are not stored.
+    class User {
+        &lt;&lt;stored&gt;&gt;
+        username
+        email
+        password
+        temperatureUnit
+        confirmed
+        isActive
+    }
+    class Favorite {
+        &lt;&lt;stored&gt;&gt;
+        name
+        region
+        country
+        latitude
+        longitude
+        pin
+        createdAt
+    }
+    class ActionLink {
+        &lt;&lt;stored&gt;&gt;
+        purpose
+        token
+        expiresAt
+    }
+    class Place {
+        &lt;&lt;not stored&gt;&gt;
+        latitude
+        longitude
+        name
+        region
+        country
+    }
+    class CurrentConditions {
+        &lt;&lt;not stored&gt;&gt;
+        temperature
+        feelsLike
+        humidity
+        windSpeed
+        cloudiness
+        pressure
+        description
+        sunrise
+        sunset
+        timezoneOffset
+    }
+    class DailyForecast {
+        &lt;&lt;not stored&gt;&gt;
+        date
+        condition
+        high
+        low
+    }
+    User "1" --> "0..*" Favorite : favorites
+    User "1" --> "0..*" ActionLink : links
+    classDef stored fill:#e8f5e9,stroke:#2e7d32
+    classDef temporary fill:#fff8e1,stroke:#f9a825
+    class User stored
+    class Favorite stored
+    class ActionLink stored
+    class Place temporary
+    class CurrentConditions temporary
+    class DailyForecast temporary
+      </pre>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
+    <script src="diagrams.js"></script>
+  </body>
+</html>

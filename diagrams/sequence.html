@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sequence — Weather app diagrams</title>
+    <link rel="stylesheet" href="diagrams.css">
+  </head>
+  <body>
+    <main>
+      <p><a href="index.html">All diagrams</a></p>
+      <h1>Sequence</h1>
+      <p>Loading weather for a place already chosen. The API key stays on the server.</p>
+      <pre class="mermaid">
+sequenceDiagram
+    accTitle: Load weather for a chosen place
+    accDescr: The browser asks Django. Django calls OpenWeather for current conditions and the five-day forecast. The API key stays on the server. Django returns one page.
+    actor Browser
+    participant Django
+    participant OpenWeather
+    Browser->>Django: Place already chosen
+    Note over Django: The API key stays on the server
+    Django->>OpenWeather: Current conditions
+    OpenWeather-->>Django: Current conditions
+    Django->>OpenWeather: Five-day forecast
+    OpenWeather-->>Django: Five-day forecast
+    Django-->>Browser: One page
+      </pre>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
+    <script src="diagrams.js"></script>
+  </body>
+</html>

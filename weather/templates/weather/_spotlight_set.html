@@ -1,0 +1,22 @@
+{% for card in cards %}
+<a
+  class="city-card"
+  href="{{ card.url }}"
+  hx-get="{{ card.url }}"
+  hx-target="#weather"
+  hx-swap="outerHTML"
+  {% if clone %}tabindex="-1"{% endif %}
+  data-name="{{ card.name }}"
+  data-latitude="{{ card.latitude }}"
+  data-longitude="{{ card.longitude }}"
+  data-temperature="{{ card.temperature }}"
+>
+  <span class="city-icon">{% include "weather/_icon.html" with kind=card.kind %}</span>
+  <span class="city-copy">
+    <span class="city-name">{{ card.name }}</span>
+    <span class="city-country">{{ card.country }}</span>
+    <span class="city-condition">{{ card.condition }}</span>
+  </span>
+  {% if card.temperature %}<span class="city-temp">{{ card.temperature }}</span>{% else %}<span class="city-temp city-temp-pending">—</span>{% endif %}
+</a>
+{% endfor %}

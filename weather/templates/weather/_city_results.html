@@ -1,0 +1,33 @@
+<p class="results-title">{{ title|default:"Choose a place" }}</p>
+<ul class="results">
+  {% for place in places %}
+  <li class="result-row">
+    <a
+      class="place-link"
+      href="{{ place.url }}"
+      hx-get="{{ place.url }}"
+      hx-target="#weather"
+      hx-swap="outerHTML"
+    >{{ place.label }}</a>
+    {% if user.is_authenticated %}
+    <form
+      method="post"
+      action="{% url 'weather:favorite-add' %}"
+      hx-post="{% url 'weather:favorite-add' %}"
+      hx-target="#saved-places"
+      hx-swap="outerHTML"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="latitude" value="{{ place.latitude }}">
+      <input type="hidden" name="longitude" value="{{ place.longitude }}">
+      <input type="hidden" name="name" value="{{ place.name }}">
+      <input type="hidden" name="region" value="{{ place.region }}">
+      <input type="hidden" name="country" value="{{ place.country }}">
+      <button type="submit">Save</button>
+    </form>
+    {% else %}
+    <a class="save-link" href="{% url 'accounts:login' %}?next={{ place.url|urlencode }}">Save</a>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>

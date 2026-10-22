@@ -1,0 +1,88 @@
+<div
+  id="weather"
+  {% if kind %}data-sky="{{ kind }}"{% endif %}
+  {% if marker_name %}
+  data-marker-name="{{ marker_name }}"
+  data-marker-temperature="{{ marker_temperature }}"
+  data-latitude="{{ latitude }}"
+  data-longitude="{{ longitude }}"
+  {% endif %}
+>
+  {% if error %}
+  <p class="alert w-full">{{ error }}</p>
+  {% endif %}
+  {% if name %}
+  <section class="now">
+    <div class="now-copy">
+      <p class="eyebrow">Current conditions</p>
+      <h1>{{ name }}</h1>
+      {% if region or country %}
+      <p class="where">{{ region }}{% if region and country %}, {% endif %}{{ country }}</p>
+      {% endif %}
+      {% if condition %}
+      <p class="condition">{% include "weather/_icon.html" with kind=kind %}{{ condition }}</p>
+      {% endif %}
+    </div>
+    <div class="now-readout">
+      <p class="temp">{{ temperature }}</p>
+      {% if high and low %}
+      <p class="range"><span>High {{ high }}</span><span>Low {{ low }}</span></p>
+      {% endif %}
+      <p class="feels">{% include "weather/_metric.html" with metric="feels" %}<span>Feels like {{ feels_like }}</span></p>
+    </div>
+  </section>
+  <section class="stats" aria-label="Details">
+    <p class="stat">{% include "weather/_metric.html" with metric="humidity" %}<span>Humidity {{ humidity }}%</span></p>
+    <p class="stat">{% include "weather/_metric.html" with metric="wind" %}<span>Wind {{ wind }}</span></p>
+    <p class="stat">{% include "weather/_metric.html" with metric="cloud" %}<span>Cloudiness {{ cloudiness }}%</span></p>
+    <p class="stat">{% include "weather/_metric.html" with metric="pressure" %}<span>Pressure {{ pressure_hpa }} hPa</span></p>
+    <p class="stat">{% include "weather/_metric.html" with metric="sunrise" %}<span>Sunrise {{ sunrise }}</span></p>
+    <p class="stat">{% include "weather/_metric.html" with metric="sunset" %}<span>Sunset {{ sunset }}</span></p>
+  </section>
+  <section class="forecast" aria-label="Daily forecast">
+    <div class="forecast-head">
+      <h2 class="section-label">This week</h2>
+      <div class="carousel-nav">
+        <button type="button" data-days="prev" aria-label="Earlier days">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" data-days="next" aria-label="Later days">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="days" tabindex="0">
+      {% for day in days %}
+      <article class="day">
+        <h2>{{ day.heading }}</h2>
+        <div class="day-icon">{% include "weather/_icon.html" with kind=day.kind %}</div>
+        <p class="day-condition">{{ day.condition }}</p>
+        <p class="day-temp">{{ day.average }}</p>
+        <p class="day-high">High {{ day.high }}</p>
+        <p class="day-low">Low {{ day.low }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="hourly" aria-label="Hourly forecast">
+    <h2 class="section-label">Hourly</h2>
+    <div class="hours" tabindex="0">
+      {% for hour in hours %}
+      <article class="hour" title="{{ hour.label }}">
+        <p class="hour-day">{{ hour.day_label }}</p>
+        <p class="hour-time">{{ hour.time }}</p>
+        <div class="hour-icon">{% include "weather/_icon.html" with kind=hour.kind %}</div>
+        <p class="hour-temp">{{ hour.temperature }}</p>
+        <p class="sr-only">{{ hour.condition }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% elif not error %}
+  <section class="welcome">
+    <p class="eyebrow">Right now</p>
+    <h1>Find the weather for any place.</h1>
+    <p class="lede">Search a city or a postal code. The same box works for both.</p>
+  </section>
+  {% endif %}
+</div>

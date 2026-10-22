@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Activity — Weather app diagrams</title>
+    <link rel="stylesheet" href="diagrams.css">
+  </head>
+  <body>
+    <main>
+      <p><a href="index.html">All diagrams</a></p>
+      <h1>Activity</h1>
+      <p>The location journey from the weather page. Successful branches end on that place's weather.</p>
+      <pre class="mermaid">
+flowchart TD
+    accTitle: Location journey
+    accDescr: From the weather page, device location, city search, or a postal code and country leads to that place's weather, or to a refusal or no-match message.
+    Start(["Weather page"]) --> Choice{"How is the place chosen?"}
+    Choice --> Device["Use my location"]
+    Choice --> City["City search"]
+    Choice --> Postal["Postal code and country"]
+
+    Device --> Asking["Finding your location…"]
+    Asking --> Allowed{"Location available?"}
+    Allowed -->|Allowed| DevicePlace["Load that place"]
+    Allowed -->|Refused or unavailable| Refused["Short note. Use my location stays available."]
+    DevicePlace --> Weather(["That place's weather"])
+
+    City --> CityResult{"How many cities match?"}
+    CityResult -->|None| NoCity["No match. The current place stays."]
+    CityResult -->|One| OneCity["Open that place"]
+    CityResult -->|Two to five| Choose["List city, region when present, and country"]
+    Choose --> Picked["Person chooses one"]
+    OneCity --> Weather
+    Picked --> Weather
+
+    Postal --> PostalResult{"A place for that postal code?"}
+    PostalResult -->|One| PostalPlace["Open that place"]
+    PostalResult -->|None| NoPostal["No matching place"]
+    PostalPlace --> Weather
+      </pre>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
+    <script src="diagrams.js"></script>
+  </body>
+</html>

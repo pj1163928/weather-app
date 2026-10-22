@@ -1,0 +1,16 @@
+<form
+  id="unit-switch"
+  class="units"
+  method="post"
+  action="{% url 'weather:unit' %}"
+  hx-post="{% url 'weather:unit' %}"
+  hx-target="#weather"
+  hx-swap="outerHTML"
+  hx-push-url="false"
+  aria-label="Temperature unit"
+  {% if oob %}hx-swap-oob="outerHTML"{% endif %}
+>
+  {% csrf_token %}
+  <button type="submit" name="unit" value="celsius" aria-pressed="{% if unit == 'fahrenheit' %}false{% else %}true{% endif %}">Celsius</button>
+  <button type="submit" name="unit" value="fahrenheit" aria-pressed="{% if unit == 'fahrenheit' %}true{% else %}false{% endif %}">Fahrenheit</button>
+</form>

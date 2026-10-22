@@ -1,0 +1,6 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+<p class="alert">{{ message }}</p>
+<p class="account-links"><a href="{% url 'accounts:confirm-again' %}?next={{ next|urlencode }}">Show that message again</a></p>
+{% endblock %}

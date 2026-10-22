@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block html_attrs %}{% if kind %}data-sky="{{ kind }}"{% endif %}{% endblock %}
+
+{% block content %}
+<header class="top">
+  <a class="brand" href="{% url 'weather:home' %}">Weather</a>
+  <div class="top-actions">
+    {% include "weather/_unit_switch.html" %}
+    {% if not request.session.location_acquired %}
+    <button id="use-my-location" class="locate" type="button" data-home="{% url 'weather:home' %}">Use my location</button>
+    {% endif %}
+    {% include "accounts/_nav.html" %}
+  </div>
+</header>
+<div class="search-wrap">
+  <form
+    class="search"
+    hx-get="{% url 'weather:search' %}"
+    hx-target="#city-results"
+    hx-swap="innerHTML"
+    hx-push-url="false"
+    hx-sync="this:replace"
+    hx-indicator="#search-state"
+  >
+    <label class="sr-only" for="place-query">City or postal code</label>
+    <input
+      id="place-query"
+      name="q"
+      type="text"
+      placeholder="City or postal code"
+      autocomplete="off"
+      required
+      role="combobox"
+      aria-autocomplete="list"
+      aria-controls="city-results"
+      hx-get="{% url 'weather:suggest' %}"
+      hx-trigger="keyup changed delay:300ms"
+      hx-target="#city-results"
+      hx-swap="innerHTML"
+    >
+    <button type="submit">Search</button>
+  </form>
+  <div id="city-results"></div>
+</div>
+<p id="search-state" class="hint htmx-indicator">Searching…</p>
+<p id="location-status" class="status-line" data-finding="Finding your location…" data-unavailable="Location is unavailable." data-snapshot="{% url 'weather:here' %}"{% if prompt_for_location %} data-auto="true"{% endif %}></p>
+<div id="here" class="here-slot"></div>
+{% if cards %}
+<section id="spotlight" class="spotlight">
+  <div class="section-head">
+    <h2>Around the world</h2>
+    <p>Scroll through the weather in other cities.</p>
+  </div>
+  <div class="world-scroll" id="world-scroll" tabindex="0" aria-label="Cities around the world">
+    <div
+      id="spotlight-cards"
+      hx-get="{% url 'weather:spotlight' %}"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    >
+      {% include "weather/_spotlight_cards.html" %}
+    </div>
+  </div>
+</section>
+{% endif %}
+<div class="stage">
+  {% include "weather/_weather.html" %}
+  <aside class="stage-map">
+    <div id="map" class="map-canvas"></div>
+    <p id="map-note" class="map-note"{% if marker_name %} hidden{% endif %}>The map appears here once a place is selected.</p>
+    {% if marker_name %}
+    <p class="map-caption" id="place-marker">{{ marker_name }}, {{ marker_temperature }}</p>
+    {% endif %}
+  </aside>
+</div>
+<script>
+  (function () {
+    var map;
+    var marker;
+    var status = document.getElementById("location-status");
+    var button = document.getElementById("use-my-location");
+    var locating = false;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function (character) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[character];
+      });
+    }
+
+    var previewName = "";
+    var worldHover = false;
+    var worldHold = false;
+    var worldHoldTimer = 0;
+    var worldCarry = 0;
+
+    function showPlace(name, temperature, latitude, longitude) {
+      var mapElement = document.getElementById("map");
+      if (!mapElement || !name || typeof L === "undefined") {
+        return;
+      }
+      var point = [Number(latitude), Number(longitude)];
+      var label = temperature
+        ? escapeHtml(name) + ", " + escapeHtml(temperature)
+        : escapeHtml(name);
+      mapElement.classList.add("is-ready");
+      var note = document.getElementById("map-note");
+      if (note) {
+        note.hidden = true;
+      }
+      window.requestAnimationFrame(function () {
+        if (!map) {
+          map = L.map(mapElement).setView(point, 11);
+          L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            referrerPolicy: "strict-origin-when-cross-origin",
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+          marker = L.marker(point).addTo(map).bindTooltip(label, {
+            permanent: true,
+            direction: "top",
+            offset: [0, -12],
+            className: "place-tip"
+          });
+        } else {
+          map.setView(point, 11);
+          marker.setLatLng(point);
+          marker.setTooltipContent(label);
+          map.invalidateSize();
+        }
+        var caption = document.getElementById("place-marker");
+        if (!caption) {
+          caption = document.createElement("p");
+          caption.className = "map-caption";
+          caption.id = "place-marker";
+          mapElement.parentElement.appendChild(caption);
+        }
+        caption.textContent = temperature ? name + ", " + temperature : name;
+      });
+    }
+
+    function showWeather(root) {
+      if (!root || !root.dataset.markerName) {
+        return;
+      }
+      var here = document.getElementById("here");
+      if (here) {
+        here.replaceChildren();
+      }
+      showPlace(
+        root.dataset.markerName,
+        root.dataset.markerTemperature,
+        root.dataset.latitude,
+        root.dataset.longitude
+      );
+    }
+
+    function showRandomMap() {
+      if (placeIsShown()) {
+        return;
+      }
+      var set = document.querySelector("#spotlight-cards .world-set");
+      if (!set) {
+        return;
+      }
+      var cards = set.querySelectorAll(".city-card");
+      if (!cards.length) {
+        return;
+      }
+      var card = null;
+      if (previewName) {
+        cards.forEach(function (item) {
+          if (!card && item.dataset.name === previewName) {
+            card = item;
+          }
+        });
+      }
+      if (!card) {
+        card = cards[Math.floor(Math.random() * cards.length)];
+        previewName = card.dataset.name || "";
+      }
+      showPlace(
+        card.dataset.name,
+        card.dataset.temperature || "",
+        card.dataset.latitude,
+        card.dataset.longitude
+      );
+    }
+
+    function worldRoot() {
+      return document.getElementById("world-scroll");
+    }
+
+    function loopSpan(world) {
+      var set = world.querySelector(".world-set");
+      if (!set) {
+        return 0;
+      }
+      var track = set.parentElement;
+      var styles = track ? window.getComputedStyle(track) : null;
+      var gap = 0;
+      if (styles) {
+        gap = parseFloat(styles.columnGap) || parseFloat(styles.gap) || 0;
+      }
+      return set.offsetWidth + gap;
+    }
+
+    function wrapWorld(world) {
+      var span = loopSpan(world);
+      if (span < 1) {
+        return;
+      }
+      while (world.scrollLeft >= span) {
+        world.scrollLeft -= span;
+      }
+    }
+
+    function stepWorld() {
+      var world = worldRoot();
+      if (!world || worldHover || worldHold) {
+        return;
+      }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+      }
+      worldCarry += 0.45;
+      if (worldCarry < 1) {
+        return;
+      }
+      var step = Math.floor(worldCarry);
+      worldCarry -= step;
+      world.scrollLeft += step;
+    }
+
+    function holdWorld() {
+      worldHold = true;
+      window.clearTimeout(worldHoldTimer);
+      worldHoldTimer = window.setTimeout(function () {
+        worldHold = false;
+      }, 2800);
+    }
+
+    function bindWorld() {
+      var world = worldRoot();
+      if (!world || world.dataset.bound === "true") {
+        return;
+      }
+      world.dataset.bound = "true";
+      world.addEventListener("scroll", function () {
+        wrapWorld(world);
+      });
+      world.addEventListener("mouseenter", function () { worldHover = true; });
+      world.addEventListener("mouseleave", function () { worldHover = false; });
+      world.addEventListener("focusin", function () { worldHover = true; });
+      world.addEventListener("focusout", function () { worldHover = false; });
+      world.addEventListener("wheel", function (event) {
+        if (Math.abs(event.deltaY) >= Math.abs(event.deltaX) && event.deltaY !== 0) {
+          world.scrollLeft += event.deltaY;
+          event.preventDefault();
+        }
+        holdWorld();
+      }, {passive: false});
+      world.addEventListener("touchstart", holdWorld, {passive: true});
+      world.addEventListener("pointerdown", holdWorld);
+    }
+
+    function setStatus(text) {
+      if (status) {
+        status.textContent = text;
+      }
+    }
+
+    function finishLocate(failed) {
+      if (!locating) {
+        return;
+      }
+      var weather = document.getElementById("weather");
+      if (weather && weather.dataset.markerName) {
+        locating = false;
+        setStatus("");
+        return;
+      }
+      if (failed) {
+        locating = false;
+        setStatus(status.dataset.unavailable);
+      }
+    }
+
+    function requestSnapshot() {
+      if (!navigator.geolocation || typeof htmx === "undefined" || !status) {
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var endpoint = status.dataset.snapshot;
+        if (!endpoint) {
+          return;
+        }
+        var url = endpoint
+          + "?latitude=" + encodeURIComponent(position.coords.latitude)
+          + "&longitude=" + encodeURIComponent(position.coords.longitude);
+        htmx.ajax("GET", url, {target: "#here", swap: "innerHTML"});
+      }, function () {});
+    }
+
+    function requestLocation() {
+      if (!status) {
+        return;
+      }
+      locating = true;
+      setStatus(status.dataset.finding);
+      if (!navigator.geolocation || typeof htmx === "undefined") {
+        locating = false;
+        setStatus(status.dataset.unavailable);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function (position) {
+        if (button) {
+          button.hidden = true;
+        }
+        var home = button && button.dataset.home ? button.dataset.home : "/";
+        var url = home
+          + "?latitude=" + encodeURIComponent(position.coords.latitude)
+          + "&longitude=" + encodeURIComponent(position.coords.longitude)
+          + "&locate=1";
+        var request = htmx.ajax("GET", url, {target: "#weather", swap: "outerHTML"});
+        if (request && request.then) {
+          request.then(function () {
+            finishLocate(false);
+          }).catch(function () {
+            locating = false;
+            setStatus(status.dataset.unavailable);
+          });
+        }
+      }, function () {
+        locating = false;
+        if (!placeIsShown()) {
+          setStatus(status.dataset.unavailable);
+        } else {
+          setStatus("");
+        }
+      });
+    }
+
+    function placeIsShown() {
+      var weather = document.getElementById("weather");
+      return Boolean(weather && weather.dataset.markerName);
+    }
+
+    function clearFinding() {
+      if (status && status.textContent === status.dataset.finding && placeIsShown()) {
+        setStatus("");
+      }
+    }
+
+    function syncDays(scroller) {
+      var forecast = scroller.closest(".forecast");
+      if (!forecast) {
+        return;
+      }
+      var previous = forecast.querySelector("[data-days='prev']");
+      var next = forecast.querySelector("[data-days='next']");
+      if (!previous || !next) {
+        return;
+      }
+      var maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      previous.disabled = scroller.scrollLeft <= 1;
+      next.disabled = maxScroll <= 1 || scroller.scrollLeft >= maxScroll - 1;
+    }
+
+    function applySky() {
+      var weather = document.getElementById("weather");
+      var sky = weather && weather.dataset.sky;
+      if (sky) {
+        document.documentElement.dataset.sky = sky;
+      } else {
+        delete document.documentElement.dataset.sky;
+      }
+      var scroller = document.querySelector(".days");
+      if (scroller) {
+        syncDays(scroller);
+      }
+    }
+
+    document.addEventListener("click", function (event) {
+      var wrap = document.querySelector(".search-wrap");
+      var results = document.getElementById("city-results");
+      if (wrap && results && !wrap.contains(event.target)) {
+        results.replaceChildren();
+      }
+      var button = event.target.closest("[data-days]");
+      if (!button || button.disabled) {
+        return;
+      }
+      var forecast = button.closest(".forecast");
+      var scroller = forecast && forecast.querySelector(".days");
+      if (!scroller) {
+        return;
+      }
+      var card = scroller.querySelector(".day");
+      var gap = parseFloat(window.getComputedStyle(scroller).columnGap) || 0;
+      var width = card ? card.getBoundingClientRect().width : 168;
+      var direction = button.getAttribute("data-days") === "next" ? 1 : -1;
+      scroller.scrollBy({left: direction * (width + gap), behavior: "smooth"});
+    });
+    document.addEventListener("scroll", function (event) {
+      if (event.target.classList && event.target.classList.contains("days")) {
+        syncDays(event.target);
+      }
+    }, true);
+
+    showWeather(document.getElementById("weather"));
+    if (!placeIsShown()) {
+      showRandomMap();
+    }
+    applySky();
+    clearFinding();
+    bindWorld();
+    window.requestAnimationFrame(function loopWorld() {
+      stepWorld();
+      window.requestAnimationFrame(loopWorld);
+    });
+    document.addEventListener("htmx:afterSwap", function (event) {
+      showWeather(document.getElementById("weather"));
+      if (!placeIsShown()) {
+        showRandomMap();
+      }
+      applySky();
+      if (event.target && event.target.id === "weather") {
+        finishLocate(true);
+      }
+      clearFinding();
+      bindWorld();
+    });
+    if (button) {
+      button.addEventListener("click", requestLocation);
+    }
+    if (status && status.dataset.auto === "true") {
+      requestSnapshot();
+    }
+  })();
+</script>
+{% endblock %}

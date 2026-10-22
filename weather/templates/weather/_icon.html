@@ -1,0 +1,34 @@
+{% if kind == "rain" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M7 16.5c-2.2 0-4-1.7-4-3.8C3 10.4 4.7 8.6 7 8.5 7.6 6.5 9.5 5 11.8 5c2.8 0 5 2.1 5.2 4.8 1.8.2 3.2 1.7 3.2 3.5 0 2-1.6 3.6-3.7 3.6H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M9 18.5v2M12 18.5v2.5M15 18.5v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% elif kind == "snow" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M12 3v18M5.5 6.5l13 11M18.5 6.5l-13 11M4 12h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% elif kind == "storm" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M7.2 14.6c-2 0-3.6-1.5-3.6-3.3 0-1.7 1.3-3.1 3.1-3.2.5-1.7 2-3 3.8-3 2.1 0 3.9 1.5 4.1 3.6 1.4.2 2.5 1.4 2.5 2.8 0 1.6-1.3 3-3 3.1H7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M12.2 14.8 10.2 18.6h2.4L11 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
+{% elif kind == "partly" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <circle cx="8.2" cy="8" r="2.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M8.2 3.6v1.3M3.8 8H5.1M4.8 4.7l.9.9M11.6 4.7l-.9.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M8.4 18.4c-1.9 0-3.4-1.4-3.4-3.2 0-1.6 1.2-3 2.9-3.2.4-1.6 1.9-2.8 3.6-2.8 1.9 0 3.4 1.3 3.7 3.1 1.5.2 2.6 1.4 2.6 2.9 0 1.6-1.4 3-3.1 3.2H8.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>
+{% elif kind == "cloud" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M7 17c-2.2 0-4-1.7-4-3.8C3 11 4.7 9.2 7 9.1 7.6 7 9.5 5.5 11.8 5.5c2.8 0 5 2.1 5.2 4.8 1.8.2 3.2 1.7 3.2 3.5 0 2-1.6 3.6-3.7 3.6H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>
+{% elif kind == "mist" %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M4 9h16M6 12h12M4 15h16M7 18h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% else %}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+  <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M12 2.5v2.2M12 19.3V21.5M2.5 12h2.2M19.3 12H21.5M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+{% endif %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Use case — Weather app diagrams</title>
+    <link rel="stylesheet" href="diagrams.css">
+  </head>
+  <body>
+    <main>
+      <p><a href="index.html">All diagrams</a></p>
+      <h1>Use case</h1>
+      <p>Actors are User and OpenWeather. Included and extending use cases are marked on the diagram.</p>
+      <pre class="mermaid">
+---
+config:
+  layout: dagre
+---
+usecase-beta
+accTitle: Weather app use cases
+accDescr: User and OpenWeather. View place includes loading weather. City search, postal search, and device location include resolving the place. Choose among matches extends city search when several cities match.
+direction LR
+actor User
+actor OpenWeather
+systemBoundary weather["Weather"]
+  ViewPlace("View place")
+  LoadWeather("Load weather from OpenWeather")
+end
+systemBoundary finding["Finding a place"]
+  CitySearch("City search")
+  PostalSearch("Postal search")
+  DeviceLocation("Device location")
+  ResolvePlace("Resolve the place with OpenWeather")
+  ChooseMatches("Choose among matches")
+end
+systemBoundary account["Account"]
+  Register("Register")
+  Confirm("Confirm")
+  LogIn("Log in")
+  ResetPassword("Reset password")
+  SwitchUnits("Switch units")
+  SaveFavorite("Save favorite")
+  RemoveFavorite("Remove favorite")
+end
+User --> ViewPlace
+User --> CitySearch
+User --> PostalSearch
+User --> DeviceLocation
+User --> ChooseMatches
+User --> Register
+User --> Confirm
+User --> LogIn
+User --> ResetPassword
+User --> SwitchUnits
+User --> SaveFavorite
+User --> RemoveFavorite
+OpenWeather --> LoadWeather
+OpenWeather --> ResolvePlace
+ViewPlace ..> : include LoadWeather
+CitySearch ..> : include ResolvePlace
+PostalSearch ..> : include ResolvePlace
+DeviceLocation ..> : include ResolvePlace
+ChooseMatches ..> : extend CitySearch
+note for ChooseMatches "Only when several cities match."
+note for SaveFavorite "The account must be confirmed."
+      </pre>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
+    <script src="diagrams.js"></script>
+  </body>
+</html>

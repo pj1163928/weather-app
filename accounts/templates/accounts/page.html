@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<header class="top">
+  <a class="brand" href="{% url 'weather:home' %}">Weather</a>
+  <div class="top-actions">
+    {% include "accounts/_nav.html" %}
+  </div>
+</header>
+<section class="account">
+  <h1>{{ heading }}</h1>
+  {% if lede %}<p class="lede">{{ lede }}</p>{% endif %}
+  {% block account %}{% endblock %}
+</section>
+{% endblock %}

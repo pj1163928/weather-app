@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>State machine — Weather app diagrams</title>
+    <link rel="stylesheet" href="diagrams.css">
+  </head>
+  <body>
+    <main>
+      <p><a href="index.html">All diagrams</a></p>
+      <h1>State machine</h1>
+      <p>The account. Password reset leaves the confirmation state unchanged.</p>
+      <pre class="mermaid">
+stateDiagram-v2
+    accTitle: Account lifecycle
+    accDescr: Register creates an unconfirmed account. A valid confirm link moves it to confirmed. Unconfirmed cannot log in. Confirmed can. Password reset does not change this state.
+    [*] --> Unconfirmed : Register
+    Unconfirmed --> Confirmed : Valid confirm link
+    Unconfirmed --> Unconfirmed : Password reset
+    Confirmed --> Confirmed : Password reset
+    note right of Unconfirmed
+        Cannot log in
+    end note
+    note right of Confirmed
+        Can log in
+    end note
+      </pre>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
+    <script src="diagrams.js"></script>
+  </body>
+</html>
