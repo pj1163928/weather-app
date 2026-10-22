@@ -72,12 +72,8 @@ accDescr: Stored types are User, Favorite, and ActionLink. A user has zero or mo
     User "1" --> "0..*" ActionLink : links
     classDef stored fill:#e8f5e9,stroke:#2e7d32
     classDef temporary fill:#fff8e1,stroke:#f9a825
-    class User stored
-    class Favorite stored
-    class ActionLink stored
-    class Place temporary
-    class CurrentConditions temporary
-    class DailyForecast temporary
+    cssClass "User,Favorite,ActionLink" stored
+    cssClass "Place,CurrentConditions,DailyForecast" temporary
       </pre>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.min.js"></script>
