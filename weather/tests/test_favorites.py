@@ -190,7 +190,7 @@ def test_a_city_row_can_be_saved(client, settings, monkeypatch):
                     "state": "Massachusetts",
                 },
             ]
-        raise AssertionError(url)
+        return {"main": {"temp": 20.0}, "weather": [{"description": "clear sky"}]}
 
     monkeypatch.setattr("weather.client.request_json", request_json)
     client.force_login(_user("ada", "ada@example.com"))
@@ -216,3 +216,61 @@ def test_a_city_row_can_be_saved(client, settings, monkeypatch):
     assert saved.status_code == 200
     assert "Springfield, Illinois, United States" in saved.content.decode()
     assert Favorite.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_saved_places_show_as_cards_on_the_home_page(client, settings, monkeypatch):
+    settings.OPENWEATHER_API_KEY = "dummy-openweather-key"
+    monkeypatch.setattr(
+        "weather.views.fetch_snapshot", lambda *args: (20.0, "clear sky")
+    )
+    client.force_login(_user("ada", "ada@example.com"))
+    client.post("/favorites/add/", _chicago())
+    client.post("/favorites/add/", _london())
+
+    page = client.get("/").content.decode()
+    cards = client.get("/saved/").content.decode()
+
+    assert 'hx-get="/saved/"' in page
+    assert "Saved places" in cards
+    assert "Chicago" in cards and "London" in cards
+    assert "20°C" in cards
+
+
+@pytest.mark.django_db
+def test_saved_cards_list_three_then_expand(client, monkeypatch):
+    client.force_login(_user("ada", "ada@example.com"))
+    for index in range(5):
+        Favorite.objects.create(
+            user=User.objects.get(username="ada"),
+            name=f"Town{index}",
+            latitude=10 + index,
+            longitude=20 + index,
+            pin=f"{index}:{index}",
+        )
+
+    cards = client.get("/saved/").content.decode()
+    visible, hidden = cards.split('class="saved-more"', 1)
+
+    assert visible.count('class="city-card"') == 3
+    assert hidden.count('class="city-card"') == 2
+    assert "Show 2 more" in hidden
+
+
+@pytest.mark.django_db
+def test_places_menu_list_shows_temperature_and_condition(
+    client, settings, monkeypatch
+):
+    settings.OPENWEATHER_API_KEY = "dummy-openweather-key"
+    monkeypatch.setattr(
+        "weather.views.fetch_snapshot", lambda *args: (20.0, "light rain")
+    )
+    client.force_login(_user("ada", "ada@example.com"))
+    client.post("/favorites/add/", _chicago())
+
+    page = client.get("/").content.decode()
+    listed = client.get("/favorites/list/").content.decode()
+
+    assert 'hx-get="/favorites/list/"' in page
+    assert "20°C · Light rain" in listed
+    assert "Chicago, Illinois, United States" in listed

@@ -1,0 +1,9 @@
+{% extends "accounts/page.html" %}
+
+{% block account %}
+<form class="delete-form" method="post" action="{% url 'accounts:delete' %}">
+  {% csrf_token %}
+  <button type="submit" class="danger">Delete my account</button>
+  <a href="{% url 'weather:home' %}">Cancel</a>
+</form>
+{% endblock %}

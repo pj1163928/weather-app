@@ -26,18 +26,18 @@
     <div class="now-readout">
       <p class="temp">{{ temperature }}</p>
       {% if high and low %}
-      <p class="range"><span>High {{ high }}</span><span>Low {{ low }}</span></p>
+      <p class="temp-range"><span>High {{ high }}</span><span>Low {{ low }}</span></p>
       {% endif %}
       <p class="feels">{% include "weather/_metric.html" with metric="feels" %}<span>Feels like {{ feels_like }}</span></p>
     </div>
   </section>
-  <section class="stats" aria-label="Details">
-    <p class="stat">{% include "weather/_metric.html" with metric="humidity" %}<span>Humidity {{ humidity }}%</span></p>
-    <p class="stat">{% include "weather/_metric.html" with metric="wind" %}<span>Wind {{ wind }}</span></p>
-    <p class="stat">{% include "weather/_metric.html" with metric="cloud" %}<span>Cloudiness {{ cloudiness }}%</span></p>
-    <p class="stat">{% include "weather/_metric.html" with metric="pressure" %}<span>Pressure {{ pressure_hpa }} hPa</span></p>
-    <p class="stat">{% include "weather/_metric.html" with metric="sunrise" %}<span>Sunrise {{ sunrise }}</span></p>
-    <p class="stat">{% include "weather/_metric.html" with metric="sunset" %}<span>Sunset {{ sunset }}</span></p>
+  <section class="readings" aria-label="Details">
+    <p class="reading">{% include "weather/_metric.html" with metric="humidity" %}<span>Humidity {{ humidity }}%</span></p>
+    <p class="reading">{% include "weather/_metric.html" with metric="wind" %}<span>Wind {{ wind }}</span></p>
+    <p class="reading">{% include "weather/_metric.html" with metric="cloud" %}<span>Cloudiness {{ cloudiness }}%</span></p>
+    <p class="reading">{% include "weather/_metric.html" with metric="pressure" %}<span>Pressure {{ pressure_hpa }} hPa</span></p>
+    <p class="reading">{% include "weather/_metric.html" with metric="sunrise" %}<span>Sunrise {{ sunrise }}</span></p>
+    <p class="reading">{% include "weather/_metric.html" with metric="sunset" %}<span>Sunset {{ sunset }}</span></p>
   </section>
   <section class="forecast" aria-label="Daily forecast">
     <div class="forecast-head">

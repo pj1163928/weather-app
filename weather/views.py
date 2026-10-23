@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from weather.client import (
@@ -104,15 +105,19 @@ def unit(request):
             return redirect("weather:home")
         return redirect(_place_push_url(place))
     if place is None:
-        return _fragment_response(
+        response = _fragment_response(
             request,
             {},
             include_unit_switch=True,
             refresh_spotlight=True,
         )
-    return _render_place(request, place, include_unit_switch=True)
+    else:
+        response = _render_place(request, place, include_unit_switch=True)
+    response["HX-Trigger"] = "unit-changed"
+    return response
 
 
+@never_cache
 def here(request):
     try:
         latitude = float(request.GET["latitude"])
@@ -160,6 +165,10 @@ def spotlight(request):
     if api_key:
         _fill_snapshots(cards, api_key, session_unit(request))
     return render(request, "weather/_spotlight_cards.html", {"cards": cards})
+
+
+def saved(request):
+    return HttpResponse(_saved_cards_html(request))
 
 
 def _open_city(request, city: str):
@@ -333,6 +342,8 @@ def _fragment_response(
         )
     if refresh_spotlight and settings.OPENWEATHER_API_KEY:
         html += _spotlight_refresh(request)
+    if include_unit_switch and request.user.is_authenticated:
+        html += _saved_cards_html(request, oob=True)
     html += _save_place_html(request, context, oob=True)
     response = HttpResponse(html)
     if place is not None:
@@ -417,6 +428,35 @@ def _fill_snapshots(cards: list[dict], api_key: str, unit: str) -> None:
         list(pool.map(load, cards))
 
 
+def _favorite_cards(request) -> list[dict]:
+    if not request.user.is_authenticated:
+        return []
+    cards = []
+    for favorite in request.user.favorites.all():
+        card = _spotlight_card(favorite.as_place())
+        card.update(
+            pk=favorite.pk,
+            display_label=favorite.display_label(),
+            open_path=favorite.open_path(),
+        )
+        cards.append(card)
+    if cards and settings.OPENWEATHER_API_KEY:
+        _fill_snapshots(cards, settings.OPENWEATHER_API_KEY, session_unit(request))
+    return cards
+
+
+def _saved_cards_html(
+    request, *, oob: bool = False, cards: list[dict] | None = None
+) -> str:
+    if cards is None:
+        cards = _favorite_cards(request)
+    return render_to_string(
+        "weather/_saved_cards.html",
+        {"cards": cards, "oob": oob},
+        request=request,
+    )
+
+
 def _spotlight_refresh(request) -> str:
     cards = [_spotlight_card(place) for place in SPOTLIGHT]
     _fill_snapshots(cards, settings.OPENWEATHER_API_KEY, session_unit(request))
@@ -464,22 +504,27 @@ def _save_place_html(request, context, *, oob: bool) -> str:
     )
 
 
-def _saved_places_html(request) -> str:
-    favorites = []
-    if request.user.is_authenticated:
-        favorites = list(request.user.favorites.all())
+def _saved_places_html(request, cards: list[dict] | None = None) -> str:
+    if cards is None:
+        cards = _favorite_cards(request)
     return render_to_string(
         "weather/_saved_places.html",
-        {"favorites": favorites},
+        {"favorites": cards},
         request=request,
     )
+
+
+def saved_list(request):
+    return HttpResponse(_saved_places_html(request))
 
 
 def _favorites_response(request, context: dict | None = None) -> HttpResponse:
     if context is None:
         context = request.session.get(LAST_PLACE_SESSION_KEY) or {}
-    html = _saved_places_html(request)
+    cards = _favorite_cards(request)
+    html = _saved_places_html(request, cards)
     html += _save_place_html(request, context, oob=True)
+    html += _saved_cards_html(request, oob=True, cards=cards)
     return HttpResponse(html)
 
 

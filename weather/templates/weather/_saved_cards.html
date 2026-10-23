@@ -1,0 +1,27 @@
+<section
+  id="saved-cards"
+  class="saved-cards"
+  {% if oob %}hx-swap-oob="outerHTML"{% endif %}
+  {% if not cards %}hidden{% endif %}
+>
+  {% if cards %}
+  <div class="section-head">
+    <h2>Saved places</h2>
+  </div>
+  <div class="saved-grid">
+    {% for card in cards|slice:":3" %}
+    {% include "weather/_saved_card.html" %}
+    {% endfor %}
+  </div>
+  {% if cards|length > 3 %}
+  <details class="saved-more">
+    <summary>Show {{ cards|length|add:"-3" }} more</summary>
+    <div class="saved-grid">
+      {% for card in cards|slice:"3:" %}
+    {% include "weather/_saved_card.html" %}
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
+  {% endif %}
+</section>

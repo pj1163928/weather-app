@@ -95,8 +95,8 @@ def test_forecast_uses_the_place_timezone_offset(client, settings, monkeypatch):
     assert response.status_code == 200
     _assert_day(body, "Wed, Oct 21", "clear sky", "10°C", "10°C", "10°C")
     _assert_day(body, "Thu, Oct 22", "few clouds", "13°C", "20°C", "5°C")
-    assert "Sunrise Thu, Oct 22, 6:42 AM" in body
-    assert "Sunset Thu, Oct 22, 6:15 PM" in body
+    assert "Sunrise 6:42 AM" in body
+    assert "Sunset 6:15 PM" in body
 
 
 @pytest.mark.django_db
@@ -142,7 +142,7 @@ def test_failed_lookup_keeps_the_local_forecast(client, settings, monkeypatch):
     body = response.content.decode()
     assert "Weather could not be loaded." in body
     _assert_day(body, "Wed, Oct 21", "clear sky", "10°C", "10°C", "10°C")
-    assert "Sunrise Thu, Oct 22, 6:42 AM" in body
+    assert "Sunrise 6:42 AM" in body
     shown = body.split('<div class="search-wrap">', 1)[1]
     assert "London" not in shown
 

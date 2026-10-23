@@ -58,6 +58,11 @@ uv run python manage.py tailwind runserver
 
 This builds the Tailwind CSS and starts the development server at <http://127.0.0.1:8000/>. If you only want the server, use `uv run python manage.py runserver`, but the styles need `tailwind` to have built the CSS at least once.
 
+**Styles missing?** Two things cause this:
+
+- `DJANGO_DEBUG` is not `true`. Django only serves `/static/` files in debug mode, and with no `.env` file it defaults to off, so the CSS returns 404. Create `.env` as shown above.
+- On Windows, the Tailwind command can crash printing emoji with a `UnicodeEncodeError`. Run it as `$env:PYTHONUTF8=1; uv run python manage.py tailwind runserver` in PowerShell (`PYTHONUTF8=1 uv run ...` in Git Bash).
+
 The map, HTMX, and Leaflet load from the internet (unpkg and OpenStreetMap), so you need a connection in the browser.
 
 ## Test

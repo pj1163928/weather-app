@@ -9,7 +9,10 @@
         hx-get="{{ favorite.open_path }}"
         hx-target="#weather"
         hx-swap="outerHTML"
-      >{{ favorite.display_label }}</a>
+      >
+        <span class="saved-name">{{ favorite.display_label }}</span>
+        {% if favorite.temperature %}<span class="saved-meta">{{ favorite.temperature }} · {{ favorite.condition|capfirst }}</span>{% endif %}
+      </a>
       <form
         method="post"
         action="{% url 'weather:favorite-remove' favorite.pk %}"
@@ -18,7 +21,9 @@
         hx-swap="outerHTML"
       >
         {% csrf_token %}
-        <button type="submit" aria-label="Remove {{ favorite.display_label }}">Remove</button>
+        <button type="submit" class="remove-place" aria-label="Remove {{ favorite.display_label }}" title="Remove">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
       </form>
     </li>
     {% endfor %}

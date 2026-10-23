@@ -1,5 +1,29 @@
 <div id="account-nav" class="account-nav">
   {% load weather_ui %}
+  <details
+    class="account-menu places-menu"
+    {% if user.is_authenticated %}
+    hx-get="{% url 'weather:favorite-list' %}"
+    hx-trigger="toggle[target.open]"
+    hx-target="#saved-places"
+    hx-swap="outerHTML"
+    {% endif %}
+  >
+    <summary class="avatar avatar-places" aria-label="Saved places">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 1 0-13 0c0 5.4 6.5 11 6.5 11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="12" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+    </summary>
+    <div class="account-panel">
+      {% if user.is_authenticated %}
+      {% include "weather/_saved_places.html" with favorites=user.favorites.all %}
+      {% else %}
+      <p class="saved-empty">Sign in to keep a list of places.</p>
+      {% endif %}
+      {% save_place %}
+    </div>
+  </details>
   {% if user.is_authenticated %}
   <details class="account-menu">
     <summary class="avatar" aria-label="Account menu for {{ user.username }}">
@@ -7,13 +31,12 @@
       <span class="sr-only">{{ user.username }}</span>
     </summary>
     <div class="account-panel">
-      {% include "weather/_saved_places.html" with favorites=user.favorites.all %}
-      {% save_place %}
       <form class="sign-out" method="post" action="{% url 'accounts:logout' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
         <button type="submit">Sign out</button>
       </form>
+      <a class="delete-link" href="{% url 'accounts:delete' %}">Delete account</a>
     </div>
   </details>
   {% else %}
@@ -32,7 +55,6 @@
       <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">Sign in</a>
       <a href="{% url 'accounts:register' %}?next={{ request.get_full_path|urlencode }}">Register</a>
       {% endif %}
-      {% save_place %}
     </div>
   </details>
   {% endif %}

@@ -206,6 +206,28 @@ def logout(request):
 
 
 @require_http_methods(["GET", "POST"])
+def delete_account(request):
+    if not request.user.is_authenticated:
+        return redirect("accounts:login")
+    if request.method == "POST":
+        user = request.user
+        auth_logout(request)
+        user.delete()
+        return redirect("weather:home")
+    return render(
+        request,
+        "accounts/delete.html",
+        {
+            "title": "Delete account",
+            "heading": "Delete your account?",
+            "lede": (
+                "This removes your account and your saved places. It cannot be undone."
+            ),
+        },
+    )
+
+
+@require_http_methods(["GET", "POST"])
 def password_reset(request):
     nxt = _destination(request)
     message = ""

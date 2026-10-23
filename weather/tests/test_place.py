@@ -39,13 +39,13 @@ def test_query_string_place_renders_metric_conditions(
     assert "<h1" in body and "Chicago" in body
     assert "Illinois, United States" in body
     assert ">21°C<" in body
-    assert 'class="range"' in body
+    assert 'class="temp-range"' in body
     assert "High 21°C" in body
     assert "Low 21°C" in body
     assert "Feels like 19°C" in body
     assert 'class="feels"' in body
     assert 'class="day-icon"' in body
-    stats = body.split('class="stats"', 1)[1].split("</section>", 1)[0]
+    stats = body.split('class="readings"', 1)[1].split("</section>", 1)[0]
     assert "Feels like" not in stats
     assert "Humidity 60%" in body
     assert "Wind 3.5 m/s" in body

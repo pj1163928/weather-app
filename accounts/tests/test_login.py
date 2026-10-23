@@ -235,3 +235,26 @@ def test_login_replaces_the_session_unit_with_the_account_unit(
     assert ">70°F<" in body
     assert "Wind 7.8 mph" in body
     assert client.session[UNIT_SESSION_KEY] == "fahrenheit"
+
+
+@pytest.mark.django_db
+def test_delete_account_asks_first_then_removes_the_user(client):
+    user = User.objects.create_user("ada", "ada@example.com", "pw-12345-long")
+    user.confirmed = True
+    user.save()
+    client.force_login(user)
+
+    page = client.get("/accounts/delete/")
+    assert page.status_code == 200
+    assert User.objects.filter(pk=user.pk).exists()
+
+    response = client.post("/accounts/delete/")
+    assert response.status_code == 302
+    assert not User.objects.filter(pk=user.pk).exists()
+    assert "_auth_user_id" not in client.session
+
+
+@pytest.mark.django_db
+def test_delete_account_needs_a_login(client):
+    response = client.get("/accounts/delete/")
+    assert response.status_code == 302

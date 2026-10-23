@@ -8,7 +8,7 @@
   <div class="top-actions">
     {% include "weather/_unit_switch.html" %}
     {% if not request.session.location_acquired %}
-    <button id="use-my-location" class="locate" type="button" data-home="{% url 'weather:home' %}">Use my location</button>
+    <button id="use-my-location" class="locate" type="button" hidden data-home="{% url 'weather:home' %}">Use my location</button>
     {% endif %}
     {% include "accounts/_nav.html" %}
   </div>
@@ -46,6 +46,9 @@
 <p id="search-state" class="hint htmx-indicator">Searching…</p>
 <p id="location-status" class="status-line" data-finding="Finding your location…" data-unavailable="Location is unavailable." data-snapshot="{% url 'weather:here' %}"{% if prompt_for_location %} data-auto="true"{% endif %}></p>
 <div id="here" class="here-slot"></div>
+{% if user.is_authenticated %}
+<section id="saved-cards" class="saved-cards" hidden hx-get="{% url 'weather:saved' %}" hx-trigger="load" hx-swap="outerHTML"></section>
+{% endif %}
 {% if cards %}
 <section id="spotlight" class="spotlight">
   <div class="section-head">
@@ -292,6 +295,14 @@
       }
     }
 
+    var hereUrl = "";
+
+    function loadHere() {
+      if (hereUrl && typeof htmx !== "undefined") {
+        htmx.ajax("GET", hereUrl, {target: "#here", swap: "innerHTML"});
+      }
+    }
+
     function requestSnapshot() {
       if (!navigator.geolocation || typeof htmx === "undefined" || !status) {
         return;
@@ -301,12 +312,19 @@
         if (!endpoint) {
           return;
         }
-        var url = endpoint
+        hereUrl = endpoint
           + "?latitude=" + encodeURIComponent(position.coords.latitude)
           + "&longitude=" + encodeURIComponent(position.coords.longitude);
-        htmx.ajax("GET", url, {target: "#here", swap: "innerHTML"});
+        loadHere();
       }, function () {});
     }
+
+    document.body.addEventListener("unit-changed", function () {
+      var here = document.getElementById("here");
+      if (here && here.children.length) {
+        loadHere();
+      }
+    });
 
     function requestLocation() {
       if (!status) {
@@ -440,8 +458,30 @@
     if (button) {
       button.addEventListener("click", requestLocation);
     }
-    if (status && status.dataset.auto === "true") {
-      requestSnapshot();
+    function applyPermission(state) {
+      if (state === "granted") {
+        if (button) {
+          button.hidden = true;
+        }
+        if (status && status.dataset.auto === "true" && !placeIsShown()) {
+          requestSnapshot();
+        }
+      } else if (button) {
+        button.hidden = false;
+      }
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({name: "geolocation"}).then(function (result) {
+        applyPermission(result.state);
+        result.onchange = function () {
+          applyPermission(result.state);
+        };
+      }).catch(function () {
+        applyPermission("prompt");
+      });
+    } else {
+      applyPermission("prompt");
     }
   })();
 </script>

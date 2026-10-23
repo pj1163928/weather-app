@@ -47,13 +47,11 @@ def display_context(place: Place, weather: PlaceWeather, unit: str = "celsius") 
         "marker_temperature": temperature,
         "condition": weather.current.description,
         "kind": condition_kind(weather.current.description),
-        "sunrise": _format_moment(
-            weather.current.sunrise_unix,
-            weather.current.timezone_offset_seconds,
+        "sunrise": _format_clock(
+            _local(weather.current.sunrise_unix, offset),
         ),
-        "sunset": _format_moment(
-            weather.current.sunset_unix,
-            weather.current.timezone_offset_seconds,
+        "sunset": _format_clock(
+            _local(weather.current.sunset_unix, offset),
         ),
         "days": days,
         "hours": _hours(weather, offset, unit),
@@ -128,11 +126,6 @@ def _format_clock(moment: datetime) -> str:
     hour = moment.hour % 12 or 12
     period = "AM" if moment.hour < 12 else "PM"
     return f"{hour}:{moment.minute:02d} {period}"
-
-
-def _format_moment(unix: int, offset: int) -> str:
-    moment = _local(unix, offset)
-    return f"{_format_day(moment)}, {_format_clock(moment)}"
 
 
 def format_temperature(celsius: float, unit: str = "celsius") -> str:

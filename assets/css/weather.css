@@ -560,8 +560,39 @@ html[data-sky="mist"] {
   font-weight: 600;
 }
 
-.spotlight {
+.spotlight,
+.saved-cards {
   margin-top: 1.75rem;
+}
+
+.saved-cards[hidden] {
+  display: none;
+}
+
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(18.5rem, 100%), 1fr));
+  gap: 0.75rem;
+}
+
+.saved-grid .city-card {
+  width: auto;
+}
+
+.saved-more {
+  margin-top: 0.75rem;
+}
+
+.saved-more summary {
+  width: fit-content;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--locate-bg);
+  color: var(--sea-deep);
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .section-head,
@@ -709,7 +740,7 @@ html[data-sky="mist"] {
 }
 
 .now,
-.stats,
+.readings,
 .forecast,
 .hourly,
 .stage-map,
@@ -823,7 +854,7 @@ html[data-sky="mist"] {
   white-space: nowrap;
 }
 
-.range {
+.temp-range {
   display: flex;
   gap: 0.9rem;
   margin: 0;
@@ -847,7 +878,7 @@ html[data-sky="mist"] {
   flex: none;
 }
 
-.stats {
+.readings {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
@@ -855,19 +886,19 @@ html[data-sky="mist"] {
   padding: 0.85rem;
 }
 
-.stat,
+.reading,
 .day h2,
 .hour-temp,
 .brand {
   color: var(--ink);
 }
 
-.stats p,
+.readings p,
 .day p {
   margin: 0;
 }
 
-.stat {
+.reading {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -877,7 +908,7 @@ html[data-sky="mist"] {
   font-weight: 600;
 }
 
-.stat .icon {
+.reading .icon {
   width: 1.2rem;
   height: 1.2rem;
   flex: none;
@@ -1086,6 +1117,14 @@ a.locate {
 
 .account-nav {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar-places {
+  background: var(--locate-bg);
+  color: var(--sea-deep);
 }
 
 .account-menu {
@@ -1174,8 +1213,59 @@ a.locate {
   gap: 0.4rem;
 }
 
+.saved-places .remove-place {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: #e5484d;
+}
+
+.saved-places .remove-place:hover {
+  background: rgba(229, 72, 77, 0.15);
+}
+
+.saved-places .remove-place svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.saved-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.account-panel > a.delete-link {
+  color: #e5484d;
+  font-size: 0.9rem;
+}
+
+.delete-form {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.account .danger {
+  padding: 0.55rem 1rem;
+  border: 1px solid #e5484d;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
 .saved-places li a {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 0.1rem;
   color: inherit;
   font-weight: 600;
   text-decoration: none;
@@ -1332,7 +1422,7 @@ a.locate {
     padding: 1.5rem;
   }
 
-  .stats {
+  .readings {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

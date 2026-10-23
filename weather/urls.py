@@ -13,6 +13,8 @@ urlpatterns = [
     path("units/", views.unit, name="unit"),
     path("spotlight/", views.spotlight, name="spotlight"),
     path("here/", views.here, name="here"),
+    path("saved/", views.saved, name="saved"),
+    path("favorites/list/", views.saved_list, name="favorite-list"),
     path("favorites/add/", views.favorite_add, name="favorite-add"),
     path("favorites/<int:pk>/remove/", views.favorite_remove, name="favorite-remove"),
 ]
