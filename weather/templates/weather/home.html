@@ -296,6 +296,7 @@
     }
 
     var hereUrl = "";
+    var locateOptions = {enableHighAccuracy: false, timeout: 10000, maximumAge: 300000};
 
     function loadHere() {
       if (hereUrl && typeof htmx !== "undefined") {
@@ -316,7 +317,7 @@
           + "?latitude=" + encodeURIComponent(position.coords.latitude)
           + "&longitude=" + encodeURIComponent(position.coords.longitude);
         loadHere();
-      }, function () {});
+      }, function () {}, locateOptions);
     }
 
     document.body.addEventListener("unit-changed", function () {
@@ -327,7 +328,7 @@
     });
 
     function requestLocation() {
-      if (!status) {
+      if (!status || locating) {
         return;
       }
       locating = true;
@@ -362,7 +363,7 @@
         } else {
           setStatus("");
         }
-      });
+      }, locateOptions);
     }
 
     function placeIsShown() {
